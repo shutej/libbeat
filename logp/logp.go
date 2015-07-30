@@ -17,8 +17,8 @@ var debugSelectorsStr *string
 type Logging struct {
 	Selectors []string
 	Files     *FileRotator
-	To_syslog *bool
-	To_files  *bool
+	ToSyslog  *bool
+	ToFiles   *bool
 }
 
 // Init combines the configuration from config with the command line
@@ -49,13 +49,13 @@ func Init(name string, config *Logging) error {
 	}
 
 	var toSyslog, toFiles bool
-	if config.To_syslog != nil {
-		toSyslog = *config.To_syslog
+	if config.ToSyslog != nil {
+		toSyslog = *config.ToSyslog
 	} else {
 		toSyslog = defaultToSyslog
 	}
-	if config.To_files != nil {
-		toFiles = *config.To_files
+	if config.ToFiles != nil {
+		toFiles = *config.ToFiles
 	} else {
 		toFiles = defaultToFiles
 	}

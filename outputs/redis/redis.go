@@ -46,7 +46,7 @@ type RedisQueueMsg struct {
 	msg   string
 }
 
-func (out *RedisOutput) Init(config outputs.MothershipConfig, topology_expire int) error {
+func (out *RedisOutput) Init(config outputs.Config, topology_expire int) error {
 
 	out.Hostname = fmt.Sprintf("%s:%d", config.Host, config.Port)
 
@@ -59,8 +59,8 @@ func (out *RedisOutput) Init(config outputs.MothershipConfig, topology_expire in
 	}
 
 	out.DbTopology = 1
-	if config.Db_topology != 0 {
-		out.DbTopology = config.Db_topology
+	if config.DbTopology != 0 {
+		out.DbTopology = config.DbTopology
 	}
 
 	out.Timeout = 5 * time.Second
@@ -75,18 +75,18 @@ func (out *RedisOutput) Init(config outputs.MothershipConfig, topology_expire in
 	}
 
 	out.FlushInterval = 1000 * time.Millisecond
-	if config.Flush_interval != nil {
-		if *config.Flush_interval < 0 {
+	if config.FlushInterval != nil {
+		if *config.FlushInterval < 0 {
 			out.flush_immediatelly = true
 			logp.Warn("Flushing to REDIS on each push, performance migh be affected")
 		} else {
-			out.FlushInterval = time.Duration(*config.Flush_interval) * time.Millisecond
+			out.FlushInterval = time.Duration(*config.FlushInterval) * time.Millisecond
 		}
 	}
 
 	out.ReconnectInterval = time.Duration(1) * time.Second
-	if config.Reconnect_interval != 0 {
-		out.ReconnectInterval = time.Duration(config.Reconnect_interval) * time.Second
+	if config.ReconnectInterval != 0 {
+		out.ReconnectInterval = time.Duration(config.ReconnectInterval) * time.Second
 	}
 
 	exp_sec := 15

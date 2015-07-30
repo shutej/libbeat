@@ -30,7 +30,7 @@ type PublishedTopology struct {
 }
 
 // Initialize Elasticsearch as output
-func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_expire int) error {
+func (out *ElasticsearchOutput) Init(config outputs.Config, topology_expire int) error {
 
 	if len(config.Protocol) == 0 {
 		config.Protocol = "http"
@@ -65,16 +65,16 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 	}
 
 	out.FlushInterval = 1000 * time.Millisecond
-	if config.Flush_interval != nil {
-		out.FlushInterval = time.Duration(*config.Flush_interval) * time.Millisecond
+	if config.FlushInterval != nil {
+		out.FlushInterval = time.Duration(*config.FlushInterval) * time.Millisecond
 	}
 	out.BulkMaxSize = 10000
-	if config.Bulk_size != nil {
-		out.BulkMaxSize = *config.Bulk_size
+	if config.BulkSize != nil {
+		out.BulkMaxSize = *config.BulkSize
 	}
 
-	if config.Max_retries != nil {
-		out.Conn.SetMaxRetries(*config.Max_retries)
+	if config.MaxRetries != nil {
+		out.Conn.SetMaxRetries(*config.MaxRetries)
 	}
 
 	logp.Info("[ElasticsearchOutput] Using Elasticsearch %s", urls)
@@ -86,7 +86,7 @@ func (out *ElasticsearchOutput) Init(config outputs.MothershipConfig, topology_e
 		logp.Info("[ElasticsearchOutput] Insert events one by one. This might affect the performance of the shipper.")
 	}
 
-	if config.Save_topology {
+	if config.SaveTopology {
 		err := out.EnableTTL()
 		if err != nil {
 			logp.Err("Fail to set _ttl mapping: %s", err)

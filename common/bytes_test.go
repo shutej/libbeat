@@ -33,7 +33,7 @@ func TestBytes_Ntohs(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, test.Output, Bytes_Ntohs(test.Input))
+		assert.Equal(t, test.Output, Ntohs(test.Input))
 	}
 }
 
@@ -67,7 +67,7 @@ func TestBytes_Ntohl(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, test.Output, Bytes_Ntohl(test.Input))
+		assert.Equal(t, test.Output, Ntohl(test.Input))
 	}
 }
 
@@ -101,7 +101,7 @@ func TestBytes_Htohl(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, test.Output, Bytes_Htohl(test.Input))
+		assert.Equal(t, test.Output, Htonl(test.Input))
 	}
 }
 
@@ -151,7 +151,7 @@ func TestBytes_Ntohll(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, test.Output, Bytes_Ntohll(test.Input))
+		assert.Equal(t, test.Output, Ntohll(test.Input))
 	}
 }
 
@@ -177,7 +177,7 @@ func TestIpv4_Ntoa(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, test.Output, Ipv4_Ntoa(test.Input))
+		assert.Equal(t, test.Output, Ipv4Ntoa(test.Input))
 	}
 }
 

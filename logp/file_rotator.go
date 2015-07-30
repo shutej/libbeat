@@ -91,16 +91,16 @@ func (rotator *FileRotator) shouldRotate() bool {
 	return false
 }
 
-func (rotator *FileRotator) FilePath(file_no int) string {
-	if file_no == 0 {
+func (rotator *FileRotator) FilePath(fileNo int) string {
+	if fileNo == 0 {
 		return filepath.Join(rotator.Path, rotator.Name)
 	}
-	filename := strings.Join([]string{rotator.Name, strconv.Itoa(file_no)}, ".")
+	filename := strings.Join([]string{rotator.Name, strconv.Itoa(fileNo)}, ".")
 	return filepath.Join(rotator.Path, filename)
 }
 
-func (rotator *FileRotator) FileExists(file_no int) bool {
-	file_path := rotator.FilePath(file_no)
+func (rotator *FileRotator) FileExists(fileNo int) bool {
+	file_path := rotator.FilePath(fileNo)
 	_, err := os.Stat(file_path)
 	if os.IsNotExist(err) {
 		return false
@@ -117,9 +117,9 @@ func (rotator *FileRotator) Rotate() error {
 	}
 
 	// delete any extra files, normally we shouldn't have any
-	for file_no := *rotator.KeepFiles; file_no < RotatorMaxFiles; file_no++ {
-		if rotator.FileExists(file_no) {
-			perr := os.Remove(rotator.FilePath(file_no))
+	for fileNo := *rotator.KeepFiles; fileNo < RotatorMaxFiles; fileNo++ {
+		if rotator.FileExists(fileNo) {
+			perr := os.Remove(rotator.FilePath(fileNo))
 			if perr != nil {
 				return perr
 			}
@@ -127,19 +127,19 @@ func (rotator *FileRotator) Rotate() error {
 	}
 
 	// shift all files from last to first
-	for file_no := *rotator.KeepFiles - 1; file_no >= 0; file_no-- {
-		if !rotator.FileExists(file_no) {
+	for fileNo := *rotator.KeepFiles - 1; fileNo >= 0; fileNo-- {
+		if !rotator.FileExists(fileNo) {
 			// file doesn't exist, don't rotate
 			continue
 		}
-		file_path := rotator.FilePath(file_no)
+		file_path := rotator.FilePath(fileNo)
 
-		if rotator.FileExists(file_no + 1) {
+		if rotator.FileExists(fileNo + 1) {
 			// next file exists, something is strange
-			return fmt.Errorf("File %s exists, when rotating would overwrite it", rotator.FilePath(file_no+1))
+			return fmt.Errorf("File %s exists, when rotating would overwrite it", rotator.FilePath(fileNo+1))
 		}
 
-		err := os.Rename(file_path, rotator.FilePath(file_no+1))
+		err := os.Rename(file_path, rotator.FilePath(fileNo+1))
 		if err != nil {
 			return err
 		}

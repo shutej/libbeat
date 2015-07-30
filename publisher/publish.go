@@ -21,8 +21,8 @@ type PublisherType struct {
 	tags           []string
 	disabled       bool
 	Index          string
-	Output         []outputs.OutputInterface
-	TopologyOutput outputs.OutputInterface
+	Output         []outputs.Interface
+	TopologyOutput outputs.Interface
 	IgnoreOutgoing bool
 	GeoLite        *libgeo.GeoIP
 
@@ -31,12 +31,12 @@ type PublisherType struct {
 }
 
 type ShipperConfig struct {
-	Name                  string
-	Refresh_topology_freq int
-	Ignore_outgoing       bool
-	Topology_expire       int
-	Tags                  []string
-	Geoip                 common.Geoip
+	Name                string
+	RefreshTopologyFreq int
+	IgnoreOutgoing      bool
+	TopologyExpire      int
+	Tags                []string
+	GeoIp               common.GeoIp
 }
 
 var Publisher PublisherType
@@ -46,7 +46,7 @@ type Topology struct {
 	Ip   string `json:"ip"`
 }
 
-var EnabledOutputPlugins map[outputs.OutputPlugin]outputs.OutputInterface = map[outputs.OutputPlugin]outputs.OutputInterface{
+var EnabledOutputPlugins map[outputs.OutputPlugin]outputs.Interface = map[outputs.OutputPlugin]outputs.Interface{
 	outputs.RedisOutput:         new(redis.RedisOutput),
 	outputs.ElasticsearchOutput: new(elasticsearch.ElasticsearchOutput),
 	outputs.FileOutput:          new(fileout.FileOutput),
@@ -212,29 +212,29 @@ func (publisher *PublisherType) PublishTopology(params ...string) error {
 }
 
 func (publisher *PublisherType) Init(publishDisabled bool,
-	outputs map[string]outputs.MothershipConfig, shipper ShipperConfig) error {
+	outputs map[string]outputs.Config, shipper ShipperConfig) error {
 	var err error
-	publisher.IgnoreOutgoing = shipper.Ignore_outgoing
+	publisher.IgnoreOutgoing = shipper.IgnoreOutgoing
 
 	publisher.disabled = publishDisabled
 	if publisher.disabled {
 		logp.Info("Dry run mode. All output types except the file based one are disabled.")
 	}
 
-	publisher.GeoLite = common.LoadGeoIPData(shipper.Geoip)
+	publisher.GeoLite = common.LoadGeoIPData(shipper.GeoIp)
 
 	for outputId, plugin := range EnabledOutputPlugins {
 		outputName := outputId.String()
 		output, exists := outputs[outputName]
 		if exists && output.Enabled && !publisher.disabled {
-			err := plugin.Init(output, shipper.Topology_expire)
+			err := plugin.Init(output, shipper.TopologyExpire)
 			if err != nil {
 				logp.Err("Fail to initialize %s plugin as output: %s", outputName, err)
 				return err
 			}
 			publisher.Output = append(publisher.Output, plugin)
 
-			if output.Save_topology {
+			if output.SaveTopology {
 				if publisher.TopologyOutput != nil {
 					logp.Err("Multiple outputs defined to store topology. Please add save_topology = true option only for one output.")
 					return errors.New("Multiple outputs defined to store topology")
@@ -271,8 +271,8 @@ func (publisher *PublisherType) Init(publishDisabled bool,
 
 	if !publisher.disabled && publisher.TopologyOutput != nil {
 		RefreshTopologyFreq := 10 * time.Second
-		if shipper.Refresh_topology_freq != 0 {
-			RefreshTopologyFreq = time.Duration(shipper.Refresh_topology_freq) * time.Second
+		if shipper.RefreshTopologyFreq != 0 {
+			RefreshTopologyFreq = time.Duration(shipper.RefreshTopologyFreq) * time.Second
 		}
 		publisher.RefreshTopologyTimer = time.Tick(RefreshTopologyFreq)
 		logp.Info("Topology map refreshed every %s", RefreshTopologyFreq)
